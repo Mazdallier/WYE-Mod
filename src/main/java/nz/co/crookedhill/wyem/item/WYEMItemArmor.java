@@ -9,11 +9,11 @@ public class WYEMItemArmor extends ItemArmor
 {
 	private String textureName;
 	
-	public WYEMItemArmor(String unlocolizedName, ArmorMaterial material, String textureName, int type) 
+	public WYEMItemArmor(String unlocalizedName, ArmorMaterial material, String textureName, int type) 
 	{
 		super(material, 0, type);
-		this.setUnlocalizedName(unlocolizedName);
-		this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
+		this.setUnlocalizedName(unlocalizedName);
+		this.setTextureName(WYEM.MODID + ":" + unlocalizedName);
 		this.textureName = textureName;
 		this.setCreativeTab(WYEM.wyemTab);
 	}
