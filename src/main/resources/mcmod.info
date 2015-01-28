@@ -1,0 +1,16 @@
+[
+{
+  "modid": "wyem",
+  "name": "WYE Mod",
+  "description": "WYE (Wear Your Enemies) Minecraft Mod, create armor out of mobs in minecraft and get abilities from it.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://www.crookedhill.co.nz/",
+  "updateUrl": "",
+  "authorList": ["Gnomorian"],
+  "credits": "The Forge and FML guys, for making this example",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
