@@ -17,33 +17,39 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 @Mod(modid = WYEM.MODID, version = WYEM.VERSION)
 public class WYEM
 {
-    public static final String MODID = "wyem";
-    public static final String VERSION = "$VERSION$";
-    
-    public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
-    public static WYEMCreativeTab wyemTab = new WYEMCreativeTab("WYEM");
-    
-    @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+	public static final String MODID = "wyem";
+	public static final String VERSION = "$VERSION$";
+
+	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
+	public static WYEMCreativeTab wyemTab = new WYEMCreativeTab("WYEM");
+
+	@EventHandler
+	public void init(FMLInitializationEvent event)
+	{
 		WYEMItem.init();
 		MinecraftForge.EVENT_BUS.register(this);
-    }
-    
-    @SubscribeEvent
-    public void onAttackedEvent(LivingAttackEvent event)
-    {
-    	/* if the attackee is a player and wearing the ender chestplate */
-    	if(event.entityLiving instanceof EntityPlayer && Arrays.asList(((EntityPlayer)event.entityLiving).inventory.armorInventory).contains(WYEMItem.enderChestplate) && event.source.isProjectile())
-    	{
-    		Random rand = new Random();
-    		//if(rand.nextFloat() <= 0.1f)
-    		//{
-    			event.setCanceled(true);
-    			event.entityLiving.posX = (event.entityLiving.posX-5d) + rand.nextDouble()*10d;
-    			event.entityLiving.posY = (event.entityLiving.posY-5d) + rand.nextDouble()*10d;
-    			event.entityLiving.posZ = (event.entityLiving.posZ-5d) + rand.nextDouble()*10d;
-    		//}
-    	}
-    }
+	}
+
+	@SubscribeEvent
+	public void onAttackedEvent(LivingAttackEvent event)
+	{
+
+		/* if the attackee is a player and wearing the ender chestplate */
+		if(event.entityLiving instanceof EntityPlayer)
+		{
+			if(event.source.damageType == "arrow") 
+			{
+				System.out.println("projectile check passed");
+				event.source.getSourceOfDamage().setDead();
+				Random rand = new Random();
+				//if(rand.nextFloat() <= 0.1f)
+				//{
+				event.entityLiving.posX = (event.entityLiving.posX-5d) + (double)rand.nextInt(10);
+				event.entityLiving.posY = (event.entityLiving.posY-5d) + (double)rand.nextInt(10);
+				event.entityLiving.posZ = (event.entityLiving.posZ-5d) + (double)rand.nextInt(10);
+				event.setCanceled(true);
+				//}
+			}
+		}
+	}
 }
