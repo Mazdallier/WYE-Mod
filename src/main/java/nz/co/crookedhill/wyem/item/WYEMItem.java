@@ -17,12 +17,12 @@ public class WYEMItem
 	public static void init()
 	{		
 		/* Register Items */
-		GameRegistry.registerItem(skeletonCrown = new WYEMItemArmor("skeleton_crown", WYEM.MATERIAL, "tutorial_1", 0), "skeleton_helmet"); //0 for helmet
-		GameRegistry.registerItem(creeperCrown = new WYEMItemArmor("creeper_crown", WYEM.MATERIAL, "tutorial_1", 0), "creeper_helmet"); //0 for helmet
-		GameRegistry.registerItem(zombieCrown = new WYEMItemArmor("zombie_crown", WYEM.MATERIAL, "tutorial_1", 0), "zombie_helmet"); //0 for helmet
+		GameRegistry.registerItem(skeletonCrown = new WYEMItemArmor("skeleton_crown", WYEM.MATERIAL, "skeletonCrown", 0), "skeleton_helmet"); //0 for helmet
+		GameRegistry.registerItem(creeperCrown = new WYEMItemArmor("creeper_crown", WYEM.MATERIAL, "creeperCrown", 0), "creeper_helmet"); //0 for helmet
+		GameRegistry.registerItem(zombieCrown = new WYEMItemArmor("zombie_crown", WYEM.MATERIAL, "zombieCrown", 0), "zombie_helmet"); //0 for helmet
 
 		GameRegistry.registerItem(enderChestplate = new WYEMItemArmor("ender_chestplate", WYEM.MATERIAL, "enderChestplate", 1), "ender_chestplate"); // 1 for chestplate
-		GameRegistry.registerItem(spiderTreads = new WYEMItemArmor("spider_treads", WYEM.MATERIAL, "spiderBoots", 3), "spider_boots"); // 3 for boots
+		GameRegistry.registerItem(spiderTreads = new WYEMItemArmor("spider_treads", WYEM.MATERIAL, "spiderTreads", 3), "spider_boots"); // 3 for boots
 		
 		/* Register Recipes */
 		GameRegistry.addRecipe(new ItemStack(WYEMItem.spiderTreads), "i i","ses",'i', Items.iron_ingot, 's', Items.string, 'e', Items.spider_eye);
