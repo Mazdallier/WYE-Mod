@@ -1,14 +1,15 @@
 package nz.co.crookedhill.wyem;
 
-import java.util.Arrays;
 import java.util.Random;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.item.WYEMItem;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -24,7 +25,7 @@ public class WYEM
 
 	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
 	public static WYEMCreativeTab wyemTab = new WYEMCreativeTab("WYEM");
-	
+
 	/* static so its not created over and over again */
 	static Random rand = new Random(System.currentTimeMillis());
 
@@ -38,32 +39,59 @@ public class WYEM
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onAttackedEvent(LivingAttackEvent event)
 	{
-		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer && event.source.damageType == "arrow")
+		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer && event.source.isProjectile())
 		{
-			teleportFromArrow(event);
+			EntityPlayer player = (EntityPlayer)event.entity;
+			for(ItemStack item : player.inventory.armorInventory)
+			{
+				if(item == null)
+				{
+					continue;
+				}
+				
+				if(item.getItem() == WYEMItem.enderChestplate && rand.nextFloat() < 0.1f) // 10% chance to cancel and teleport.
+				{
+					event.setCanceled(true);
+					event.source.getSourceOfDamage().setDead();
+					/* this line exists because .setDead doesnt hapen streat away, so the player can still get damaged */
+					event.source.getSourceOfDamage().setPosition(event.source.getSourceOfDamage().posX, event.source.getSourceOfDamage().posY+1000.0d, event.source.getSourceOfDamage().posZ);
+					teleportFromDamage((EntityPlayer)event.entity);
+					break;
+				}
+			}
 		}	
 	}
-	
-	private void teleportFromArrow(LivingAttackEvent event)
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onHurtEvent(LivingHurtEvent event)
 	{
-		if(rand.nextFloat() <= 0.1f)
+		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer && event.entity.handleLavaMovement())
 		{
-			event.setCanceled(true);
-			event.source.getSourceOfDamage().setDead();
-			/* this line exists because .setDead doesnt hapen streat away, so the player can still get damaged */
-			event.source.getSourceOfDamage().setPosition(event.source.getSourceOfDamage().posX, event.source.getSourceOfDamage().posY+1000.0d, event.source.getSourceOfDamage().posZ);
-			
-			
-			double xpos = ((event.entityLiving.posX-5.0d) + (double)rand.nextInt(10));
-			double ypos = ((event.entityLiving.posY-5.0d) + (double)rand.nextInt(10));
-			double zpos = ((event.entityLiving.posZ-5.0d) + (double)rand.nextInt(10));
-			while(!event.entity.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
+			for(ItemStack item : ((EntityPlayer) event.entity).inventory.armorInventory)
 			{
-				ypos += 1.0d;
+				if(item == null)
+				{
+					continue;
+				}
+				if(item.getItem() == WYEMItem.enderChestplate)
+				{
+					teleportFromDamage((EntityPlayer)event.entity);
+					break;
+				}
 			}
-			((EntityPlayer)event.entity).setPositionAndUpdate(xpos, ypos, zpos);
-			int player = 5;
-			Object object = new Object();
 		}
+	}
+
+	private static void teleportFromDamage(EntityPlayer player)
+	{
+		double xpos = ((player.posX-5.0d) + (double)rand.nextInt(10));
+		double ypos = ((player.posY-5.0d) + (double)rand.nextInt(10));
+		double zpos = ((player.posZ-5.0d) + (double)rand.nextInt(10));
+		while(!player.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
+		{
+			ypos += 1.0d;
+		}
+		player.setPositionAndUpdate(xpos, ypos, zpos);
+
 	}
 }
