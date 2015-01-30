@@ -3,6 +3,7 @@ package nz.co.crookedhill.wyem;
 import java.util.Random;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
@@ -56,6 +57,7 @@ public class WYEM
 					/* this line exists because .setDead doesnt hapen streat away, so the player can still get damaged */
 					event.source.getSourceOfDamage().setPosition(event.source.getSourceOfDamage().posX, event.source.getSourceOfDamage().posY+1000.0d, event.source.getSourceOfDamage().posZ);
 					teleportFromDamage((EntityPlayer)event.entity);
+					item.attemptDamageItem(3, rand);
 					break;
 				}
 			}
@@ -76,6 +78,7 @@ public class WYEM
 				if(item.getItem() == WYEMItem.enderChestplate)
 				{
 					teleportFromDamage((EntityPlayer)event.entity);
+					item.attemptDamageItem(3, rand);
 					break;
 				}
 			}
