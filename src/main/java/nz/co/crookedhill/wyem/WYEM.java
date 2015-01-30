@@ -1,5 +1,6 @@
 package nz.co.crookedhill.wyem;
 
+import java.io.File;
 import java.util.Random;
 
 import net.minecraft.block.material.Material;
@@ -15,6 +16,7 @@ import nz.co.crookedhill.wyem.item.WYEMItem;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -29,6 +31,12 @@ public class WYEM
 
 	/* static so its not created over and over again */
 	static Random rand = new Random(System.currentTimeMillis());
+	
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event)
+	{
+		WYEMConfigHelper.init(new File(event.getModConfigurationDirectory().getAbsolutePath() + File.separator + WYEM.MODID + File.separator + WYEM.MODID + ".cfg"));
+	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event)
@@ -50,7 +58,7 @@ public class WYEM
 					continue;
 				}
 				
-				if(item.getItem() == WYEMItem.enderChestplate && rand.nextFloat() < 0.1f) // 10% chance to cancel and teleport.
+				if(item.getItem() == WYEMItem.enderChestplate && rand.nextFloat() < WYEMConfigHelper.enderTeleportChance) // 10% chance to cancel and teleport.
 				{
 					event.setCanceled(true);
 					event.source.getSourceOfDamage().setDead();
