@@ -1,16 +1,16 @@
 package nz.co.crookedhill.wyem.item;
 
 import net.minecraft.item.ItemSword;
+import net.minecraftforge.common.util.EnumHelper;
 import nz.co.crookedhill.wyem.WYEM;
 
 public class WYEMItemHeadCollector extends ItemSword
 {
 
 	public WYEMItemHeadCollector(String unlocolizedName) {
-		super(ToolMaterial.EMERALD);
+		super(EnumHelper.addToolMaterial("wyemtool", 500, 500, 500, 1, 25));
 		this.setCreativeTab(WYEM.wyemTab);
 		this.setUnlocalizedName(unlocolizedName);
 		this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
-		this.setMaxDamage(5);
 	}
 }
