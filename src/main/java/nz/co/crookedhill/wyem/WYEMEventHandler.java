@@ -2,9 +2,16 @@ package nz.co.crookedhill.wyem;
 
 import java.util.Random;
 
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.item.WYEMItem;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -61,6 +68,53 @@ public class WYEMEventHandler
 					event.ammount -= (event.ammount * WYEMConfigHelper.spiderDamageReduction);
 					item.attemptDamageItem(3, rand);
 					break;
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onDeathEvent(LivingDeathEvent event)
+	{
+		if(event.source.getEntity() instanceof EntityPlayer && ((EntityPlayer)event.source.getEntity()).getHeldItem().getItem() == WYEMItem.headCollector)
+		{
+			if(rand.nextDouble() <= WYEMConfigHelper.headCollectorChance)
+			{
+				if(event.entity instanceof EntitySkeleton)
+				{
+					EntitySkeleton skele = (EntitySkeleton)event.entity;
+					/* is normal skeleton */
+					if(((EntitySkeleton)event.entity).getSkeletonType() == 0)
+					{
+						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 0));
+						event.entity.worldObj.spawnEntityInWorld(item);
+					}
+					/* is wither skeleton */
+					if(((EntitySkeleton)event.entity).getSkeletonType() == 1)
+					{
+						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 1));
+						event.entity.worldObj.spawnEntityInWorld(item);
+					}
+				}
+				else if(event.entity instanceof EntityZombie)
+				{
+					EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 2));
+					event.entity.worldObj.spawnEntityInWorld(item);
+				}
+				else if(event.entity instanceof EntityCreeper)
+				{
+					EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 4));
+					event.entity.worldObj.spawnEntityInWorld(item);
+				}
+				else if(event.entity instanceof EntityPlayer)
+				{
+					EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 3));
+					if(!item.getEntityItem().hasTagCompound())
+					{
+						item.getEntityItem().stackTagCompound = new NBTTagCompound();
+					}
+					item.getEntityItem().getTagCompound().setString("SkullOwner", ((EntityPlayer)event.source.getEntity()).getDisplayName());
+					event.entity.worldObj.spawnEntityInWorld(item);
 				}
 			}
 		}

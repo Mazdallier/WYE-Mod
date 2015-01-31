@@ -7,8 +7,8 @@
   "mcversion": "${mcversion}",
   "url": "http://www.crookedhill.co.nz/",
   "updateUrl": "",
-  "authorList": ["Gnomorian"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["Gnomorian", "Black_Saturn"],
+  "credits": "Gnomorian for the coding, Black_Saturn for making the textures and inspiration for the mod.",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

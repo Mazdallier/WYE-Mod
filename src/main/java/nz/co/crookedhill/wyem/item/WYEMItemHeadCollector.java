@@ -11,5 +11,6 @@ public class WYEMItemHeadCollector extends ItemSword
 		this.setCreativeTab(WYEM.wyemTab);
 		this.setUnlocalizedName(unlocolizedName);
 		this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
+		this.setMaxDamage(5);
 	}
 }
