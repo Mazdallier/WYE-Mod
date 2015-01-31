@@ -10,12 +10,16 @@ public class WYEMConfigHelper
 	public static double enderTeleportChance;
 	public static int enderTeleportDistance;
 	
+	public static double spiderDamageReduction;
+	
 	public static void init(File file){
 		config = new Configuration(file);
 		try{
 			config.load();
 			enderTeleportChance = config.get("Ender Chestplate", "TeleportChance", 0.1D, "The percentage chance you will teleport when attacked with an arrow, 0.1=10%, 1.0=100%", 0.0D, 1.0D).getDouble();
 			enderTeleportDistance = config.getInt("Max Teleport Distance", "Ender Chestplate", 5, 0, 100, "The maximum distance you will travel when teleported by the ender chestplate.");
+			
+			spiderDamageReduction = config.get("Spider Treads", "Damage Reduction", 0.1D, "The percentage damage that will be deducted from falling when wearing spider treads, 0.1=10%, 1.0=100%", 0.0D, 1.0D).getDouble();
 		}
 		catch(Exception e){
 			System.out.println("Config shat itself.");

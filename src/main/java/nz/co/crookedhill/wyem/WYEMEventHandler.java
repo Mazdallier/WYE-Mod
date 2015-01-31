@@ -52,6 +52,18 @@ public class WYEMEventHandler
 				}
 			}
 		}
+		else if(event.entity instanceof EntityPlayer && event.source.getDamageType() == "fall")
+		{
+			for(ItemStack item : ((EntityPlayer)event.entity).inventory.armorInventory)
+			{
+				if(item.getItem() == WYEMItem.spiderTreads)
+				{
+					event.ammount -= (event.ammount * WYEMConfigHelper.spiderDamageReduction);
+					item.attemptDamageItem(3, rand);
+					break;
+				}
+			}
+		}
 	}
 
 	private static void teleportFromDamage(EntityPlayer player)
