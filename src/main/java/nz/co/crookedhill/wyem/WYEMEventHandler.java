@@ -1,9 +1,12 @@
 package nz.co.crookedhill.wyem;
 
+import java.util.ArrayList;
 import java.util.Random;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.item.WYEMItem;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -128,6 +132,51 @@ public class WYEMEventHandler
 
 		}
 	}
+	
+	public static void onLivingEvent(LivingUpdateEvent event)
+	{
+		if(event.entity instanceof EntityPlayer)
+		{
+			for(ItemStack item : ((EntityPlayer)event.entity).inventory.armorInventory)
+			{
+				if(item.getItem() == WYEMItem.creeperCrown)
+				{
+					passifyEntities((EntityPlayer)event.entity, EntityCreeper.class, 0);
+					break;
+				}
+				if(item.getItem() == WYEMItem.skeletonCrown)
+				{
+					passifyEntities((EntityPlayer)event.entity, EntitySkeleton.class, 0);
+					break;
+				}
+				if(item.getItem() == WYEMItem.witherCrown)
+				{
+					passifyEntities((EntityPlayer)event.entity, EntitySkeleton.class, 1);
+					break;
+				}
+				if(item.getItem() == WYEMItem.zombieCrown)
+				{
+					passifyEntities((EntityPlayer)event.entity, EntityZombie.class, 0);
+					break;
+				}
+			}
+		}
+	}
+	/**
+	 * loop through the world object stoping the entity from attacking the wearer
+	 * @param player player with the crown
+	 * @param mob mob type to stop from attacking
+	 * @param monsterType if skeleton, specify if its normal or wither. if not skeleton, use 0
+	 */
+	private static void passifyEntities(EntityPlayer player, Class<?> creature, int monsterType) {
+		for(Entity entity : ((ArrayList<Entity>)player.worldObj.getLoadedEntityList()))
+		{
+			if(entity.getClass().getName() == creature.getName())
+			{
+				System.out.println(creature.getName());
+			}
+		}
+	}
 
 	private static void teleportFromDamage(EntityPlayer player)
 	{
@@ -139,6 +188,5 @@ public class WYEMEventHandler
 			ypos += 1.0d;
 		}
 		player.setPositionAndUpdate(xpos, ypos, zpos);
-
 	}
 }
