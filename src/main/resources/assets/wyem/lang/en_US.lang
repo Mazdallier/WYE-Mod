@@ -3,7 +3,9 @@
 item.skeleton_crown.name=Skeleton Crown
 item.zombie_crown.name=Zombie Crown
 item.creeper_crown.name=Creeper Crown
+item.wither_crown.name=Wither Crown
 item.ender_chestplate.name=Ender Chestplate
 item.spider_treads.name=Spider Treads
+item.head_collector.name=Head Collector
 
-## Creative Tabs ##
+itemGroup.tabWYEM=WYEM

@@ -2,6 +2,8 @@ package nz.co.crookedhill.wyem;
 
 import java.io.File;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
@@ -13,6 +15,8 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @Mod(modid = WYEM.MODID, version = WYEM.VERSION)
 public class WYEM
@@ -27,8 +31,14 @@ public class WYEM
 	public static WYEM instance;
 
 	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
-	public static WYEMCreativeTab wyemTab = new WYEMCreativeTab("WYEM");
-	
+	//Use a custom item as an icon (assuming it is instantiated in a class called ModItems)
+	public static CreativeTabs tabCustom = new CreativeTabs("tabWYEM") {
+	    @Override
+	    @SideOnly(Side.CLIENT)
+	    public Item getTabIconItem() {
+	        return WYEMItem.headCollector;
+	    }
+	};
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
