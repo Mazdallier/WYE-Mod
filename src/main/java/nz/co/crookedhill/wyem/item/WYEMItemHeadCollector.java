@@ -9,7 +9,7 @@ public class WYEMItemHeadCollector extends ItemSword
 
 	public WYEMItemHeadCollector(String unlocolizedName) {
 		super(EnumHelper.addToolMaterial("wyemtool", 500, 500, 500, 1, 25));
-		this.setCreativeTab(WYEM.wyemTab);
+		this.setCreativeTab(WYEM.tabWyem);
 		this.setUnlocalizedName(unlocolizedName);
 		this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
 	}

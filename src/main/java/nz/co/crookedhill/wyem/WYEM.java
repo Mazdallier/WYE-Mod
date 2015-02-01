@@ -32,13 +32,14 @@ public class WYEM
 
 	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
 	//Use a custom item as an icon (assuming it is instantiated in a class called ModItems)
-	public static CreativeTabs tabCustom = new CreativeTabs("tabWYEM") {
+	public static CreativeTabs tabWyem = new CreativeTabs("tabWYEM") {
 	    @Override
 	    @SideOnly(Side.CLIENT)
 	    public Item getTabIconItem() {
 	        return WYEMItem.headCollector;
 	    }
 	};
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
