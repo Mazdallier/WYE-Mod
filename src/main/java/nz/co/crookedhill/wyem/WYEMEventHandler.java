@@ -6,7 +6,6 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,6 +17,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.item.WYEMItem;
+import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -132,61 +132,72 @@ public class WYEMEventHandler
 
 		}
 	}
-	
-	public static void onLivingEvent(LivingUpdateEvent event)
+	@SubscribeEvent
+	public void onLivingEvent(LivingUpdateEvent event)
 	{
-		if(event.entity instanceof EntityPlayer)
+		if(event.entity instanceof EntitySkeleton)
 		{
-			for(ItemStack item : ((EntityPlayer)event.entity).inventory.armorInventory)
+			EntitySkeleton skel = (EntitySkeleton)event.entity;
+			/* 0= skeleton, 1= wither skeleton */
+			if(skel.getSkeletonType() == 0)
 			{
-				if(item.getItem() == WYEMItem.creeperCrown)
+				Entity target = skel.getEntityToAttack();
+				if(target instanceof EntityPlayer)
 				{
-					passifyEntities((EntityPlayer)event.entity, EntityCreeper.class, 0);
-					break;
+					System.out.println("Target is player");
+					for(ItemStack item : ((EntityPlayer) target).inventory.armorInventory)
+					{
+						if(item.getItem() instanceof WYEMItemCrown)
+						{
+							System.out.println("Target wears a crown");
+							skel.setTarget(null);
+							break;
+						}
+						System.out.println(((EntityPlayer) target).inventory.armorInventory[0].getDisplayName());
+					}
 				}
-				if(item.getItem() == WYEMItem.skeletonCrown)
-				{
-					passifyEntities((EntityPlayer)event.entity, EntitySkeleton.class, 0);
-					break;
-				}
-				if(item.getItem() == WYEMItem.witherCrown)
-				{
-					passifyEntities((EntityPlayer)event.entity, EntitySkeleton.class, 1);
-					break;
-				}
-				if(item.getItem() == WYEMItem.zombieCrown)
-				{
-					passifyEntities((EntityPlayer)event.entity, EntityZombie.class, 0);
-					break;
-				}
+			}
+			else
+			{
+				
 			}
 		}
-	}
-	/**
-	 * loop through the world object stoping the entity from attacking the wearer
-	 * @param player player with the crown
-	 * @param mob mob type to stop from attacking
-	 * @param monsterType if skeleton, specify if its normal or wither. if not skeleton, use 0
-	 */
-	private static void passifyEntities(EntityPlayer player, Class<?> creature, int monsterType) {
-		for(Entity entity : ((ArrayList<Entity>)player.worldObj.getLoadedEntityList()))
+		else if(event.entity instanceof EntityZombie)
 		{
-			if(entity.getClass().getName() == creature.getName())
+			EntityZombie zomb = (EntityZombie)event.entity;
+			Entity target = zomb.getEntityToAttack();
+			if(target instanceof EntityPlayer)
 			{
-				System.out.println(creature.getName());
+				System.out.println("Target is player");
+				for(ItemStack item : ((EntityPlayer) target).inventory.armorInventory)
+				{
+					if(item.getItem() instanceof WYEMItemCrown)
+					{
+						System.out.println("Target wears a crown");
+						zomb.setTarget(null);
+						break;
+					}
+					System.out.println(((EntityPlayer) target).inventory.armorInventory[0].getDisplayName());
+				}
 			}
+			
+		}
+		else if (event.entity instanceof EntityCreeper)
+		{
+			EntityCreeper crep = (EntityCreeper)event.entity;
+			
 		}
 	}
 
-	private static void teleportFromDamage(EntityPlayer player)
+private static void teleportFromDamage(EntityPlayer player)
+{
+	double xpos = ((player.posX-5.0d) + (double)rand.nextInt(10));
+	double ypos = ((player.posY-5.0d) + (double)rand.nextInt(10));
+	double zpos = ((player.posZ-5.0d) + (double)rand.nextInt(10));
+	while(!player.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
 	{
-		double xpos = ((player.posX-5.0d) + (double)rand.nextInt(10));
-		double ypos = ((player.posY-5.0d) + (double)rand.nextInt(10));
-		double zpos = ((player.posZ-5.0d) + (double)rand.nextInt(10));
-		while(!player.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
-		{
-			ypos += 1.0d;
-		}
-		player.setPositionAndUpdate(xpos, ypos, zpos);
+		ypos += 1.0d;
 	}
+	player.setPositionAndUpdate(xpos, ypos, zpos);
+}
 }
