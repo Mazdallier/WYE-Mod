@@ -1,9 +1,11 @@
 package nz.co.crookedhill.wyem;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -12,12 +14,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.item.WYEMItem;
-import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -46,6 +48,90 @@ public class WYEMEventHandler
 				}
 			}
 		}	
+	}
+	
+	@SubscribeEvent
+	public void onJoinEvent(EntityJoinWorldEvent event)
+	{
+		if(event.entity instanceof EntityZombie)
+		{
+			System.out.println("a zombie joined the world");
+			EntityZombie zomb = (EntityZombie)event.entity;
+			List list = zomb.targetTasks.taskEntries;
+			/*
+			 * this exists because there are 2 instances of the object we want to replace, but the 
+			 * one we want to replace was added first, this is used to stop the replacement of the second.
+			 */
+			int foundClasses = 0;
+			for(int i = 0; i < zomb.targetTasks.taskEntries.size(); i++)
+			{
+				if(list.get(i) instanceof EntityAITaskEntry)
+				{
+					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
+					{
+						foundClasses++;
+						if(foundClasses < 2 )
+						{
+							System.out.println("removing old ai");
+							((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(zomb, EntityPlayer.class, 0, true, "zombie_crown");
+						}
+					}
+				}
+			}
+		}
+		if(event.entity instanceof EntityCreeper)
+		{
+			System.out.println("a zombie joined the world");
+			EntityCreeper crep = (EntityCreeper)event.entity;
+			List list = crep.targetTasks.taskEntries;
+			for(int i = 0; i < crep.targetTasks.taskEntries.size(); i++)
+			{
+				if(list.get(i) instanceof EntityAITaskEntry)
+				{
+					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
+					{
+						System.out.println("removing old ai");
+						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(crep, EntityPlayer.class, 0, true, "creeper_crown");
+					}
+				}
+			}
+		}
+		/* if wither skeleton */
+		if(event.entity instanceof EntitySkeleton && ((EntitySkeleton)event.entity).getSkeletonType() == 1)
+		{
+			System.out.println("a zombie joined the world");
+			EntitySkeleton skel = (EntitySkeleton)event.entity;
+			List list = skel.targetTasks.taskEntries;
+			for(int i = 0; i < skel.targetTasks.taskEntries.size(); i++)
+			{
+				if(list.get(i) instanceof EntityAITaskEntry)
+				{
+					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
+					{
+						System.out.println("removing old ai");
+						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(skel, EntityPlayer.class, 0, true, "wither_crown");
+					}
+				}
+			}
+		}
+		/* if regular skeleton */
+		if(event.entity instanceof EntitySkeleton && ((EntitySkeleton)event.entity).getSkeletonType() == 0)
+		{
+			System.out.println("a zombie joined the world");
+			EntitySkeleton skel = (EntitySkeleton)event.entity;
+			List list = skel.targetTasks.taskEntries;
+			for(int i = 0; i < skel.targetTasks.taskEntries.size(); i++)
+			{
+				if(list.get(i) instanceof EntityAITaskEntry)
+				{
+					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
+					{
+						System.out.println("removing old ai");
+						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(skel, EntityPlayer.class, 0, true, "skeleton_crown");
+					}
+				}
+			}
+		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -138,66 +224,78 @@ public class WYEMEventHandler
 		if(event.entity instanceof EntitySkeleton)
 		{
 			EntitySkeleton skel = (EntitySkeleton)event.entity;
-			/* 0= skeleton, 1= wither skeleton */
+			 //0= skeleton, 1= wither skeleton 
 			if(skel.getSkeletonType() == 0)
 			{
-				Entity target = skel.getEntityToAttack();
+				Entity target = skel.getAITarget();
 				if(target instanceof EntityPlayer)
 				{
-					System.out.println("Target is player");
-					for(ItemStack item : ((EntityPlayer) target).inventory.armorInventory)
+					ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
+					if(item != null && item.getItem().getUnlocalizedName().contains("skeleton_crown"));
 					{
-						if(item.getItem() instanceof WYEMItemCrown)
-						{
-							System.out.println("Target wears a crown");
-							skel.setTarget(null);
-							break;
-						}
-						System.out.println(((EntityPlayer) target).inventory.armorInventory[0].getDisplayName());
+						skel.setTarget(null);
+						skel.setRevengeTarget(null);
 					}
 				}
 			}
 			else
 			{
-				
+				 //If entity is a wither skeleton 
+				Entity target = skel.getAITarget();
+				if(target instanceof EntityPlayer)
+				{
+					ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
+					if(item != null && item.getItem().getUnlocalizedName().contains("wither_crown"));
+					{
+						skel.setTarget(null);
+						skel.setRevengeTarget(null);
+					}
+				}
 			}
 		}
 		else if(event.entity instanceof EntityZombie)
 		{
 			EntityZombie zomb = (EntityZombie)event.entity;
-			Entity target = zomb.getEntityToAttack();
+			Entity target = zomb.getAITarget();
 			if(target instanceof EntityPlayer)
 			{
-				System.out.println("Target is player");
-				for(ItemStack item : ((EntityPlayer) target).inventory.armorInventory)
+				if(target instanceof EntityPlayer)
 				{
-					if(item.getItem() instanceof WYEMItemCrown)
+					ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
+					if(item != null && item.getItem().getUnlocalizedName().contains("zombie_crown"));
 					{
-						System.out.println("Target wears a crown");
 						zomb.setTarget(null);
-						break;
+						zomb.setRevengeTarget(null);
 					}
-					System.out.println(((EntityPlayer) target).inventory.armorInventory[0].getDisplayName());
 				}
 			}
-			
+
 		}
 		else if (event.entity instanceof EntityCreeper)
 		{
 			EntityCreeper crep = (EntityCreeper)event.entity;
-			
+			Entity target = crep.getAITarget();
+			if(target instanceof EntityPlayer)
+			{
+				ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
+				if(item != null && item.getItem().getUnlocalizedName().contains("creeper_crown"));
+				{
+					crep.setTarget(null);
+					crep.setRevengeTarget(null);
+				}
+			}
 		}
 	}
 
-private static void teleportFromDamage(EntityPlayer player)
-{
-	double xpos = ((player.posX-5.0d) + (double)rand.nextInt(10));
-	double ypos = ((player.posY-5.0d) + (double)rand.nextInt(10));
-	double zpos = ((player.posZ-5.0d) + (double)rand.nextInt(10));
-	while(!player.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
+	private static void teleportFromDamage(EntityPlayer player)
 	{
-		ypos += 1.0d;
+		double xpos = ((player.posX-5.0d) + (double)rand.nextInt(10));
+		double ypos = ((player.posY-5.0d) + (double)rand.nextInt(10));
+		double zpos = ((player.posZ-5.0d) + (double)rand.nextInt(10));
+		while(!player.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
+		{
+			ypos += 1.0d;
+		}
+		player.setPositionAndUpdate(xpos, ypos, zpos);
 	}
-	player.setPositionAndUpdate(xpos, ypos, zpos);
-}
 }
