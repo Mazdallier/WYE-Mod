@@ -1,8 +1,5 @@
 package nz.co.crookedhill.wyem.item;
 
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,10 +19,10 @@ public class WYEMItem
 	public static void init()
 	{		
 		/* Register Items */
-		GameRegistry.registerItem(skeletonCrown = new WYEMItemCrown("skeleton_crown", WYEM.MATERIAL, "skeletonCrown", 0, EntitySkeleton.class), "skeleton_helmet"); //0 for helmet
-		GameRegistry.registerItem(creeperCrown = new WYEMItemCrown("creeper_crown", WYEM.MATERIAL, "creeperCrown", 0, EntityCreeper.class), "creeper_helmet"); //0 for helmet
-		GameRegistry.registerItem(zombieCrown = new WYEMItemCrown("zombie_crown", WYEM.MATERIAL, "zombieCrown", 0, EntityZombie.class), "zombie_helmet"); //0 for helmet
-		GameRegistry.registerItem(witherCrown = new WYEMItemCrown("wither_crown", WYEM.MATERIAL, "witherCrown", 0, EntitySkeleton.class), "wither_helmet"); //0 for helmet
+		GameRegistry.registerItem(skeletonCrown = new WYEMItemCrown("skeleton_crown", WYEM.MATERIAL, "skeletonCrown", 0), "skeleton_helmet"); //0 for helmet
+		GameRegistry.registerItem(creeperCrown = new WYEMItemCrown("creeper_crown", WYEM.MATERIAL, "creeperCrown", 0), "creeper_helmet"); //0 for helmet
+		GameRegistry.registerItem(zombieCrown = new WYEMItemCrown("zombie_crown", WYEM.MATERIAL, "zombieCrown", 0), "zombie_helmet"); //0 for helmet
+		GameRegistry.registerItem(witherCrown = new WYEMItemCrown("wither_crown", WYEM.MATERIAL, "witherCrown", 0), "wither_helmet"); //0 for helmet
 		
 		GameRegistry.registerItem(headCollector = new WYEMItemHeadCollector("head_collector"), "head_collector");
 

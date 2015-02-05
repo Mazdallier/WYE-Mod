@@ -62,6 +62,7 @@ public class WYEMEventHandler
 			 * this exists because there are 2 instances of the object we want to replace, but the 
 			 * one we want to replace was added first, this is used to stop the replacement of the second.
 			 */
+			//TODO: marker here so i know where the trouble is if the list isnt sorted the way i like.
 			int foundClasses = 0;
 			for(int i = 0; i < zomb.targetTasks.taskEntries.size(); i++)
 			{
