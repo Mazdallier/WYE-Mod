@@ -10,6 +10,8 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITarget;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import nz.co.crookedhill.wyem.item.WYEMItemCrown;
@@ -76,7 +78,6 @@ public class EntityAINearestModified extends EntityAITarget
             double d0 = this.getTargetDistance();
             List list = this.taskOwner.worldObj.selectEntitiesWithinAABB(this.targetClass, this.taskOwner.boundingBox.expand(d0, 4.0D, d0), this.targetEntitySelector);
             Collections.sort(list, this.theNearestAttackableTargetSorter);
-
             if (list.isEmpty())
             {
                 return false;
@@ -87,15 +88,30 @@ public class EntityAINearestModified extends EntityAITarget
             	{
             		if(list.get(i) instanceof EntityPlayer)
             		{
-            			ItemStack itemstack = ((EntityPlayer)list.get(i)).inventory.armorInventory[3];
+        				System.out.println("I am an anoying message that is alwasy there!");
+
+            			EntityPlayer player = (EntityPlayer)list.get(i);
+            			ItemStack itemstack = player.inventory.armorInventory[3];
             			if(itemstack != null && itemstack.getItem() instanceof WYEMItemCrown)
             			{
             				if(((WYEMItemCrown)itemstack.getItem()).friendlyString.equals(helmetName))
-            					list.remove(i);
+            				{
+            					list = this.taskOwner.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, ((EntityPlayer)list.get(i)).boundingBox.expand(d0, 4.0D, d0));
+            					for(int j = 0; j < list.size(); j++)
+            					{
+            						if(list.get(j).equals(player))
+            						{
+            							list.remove(j);
+            							break;
+            						}
+            					}
+            					loopEntities(list);
+                	            Collections.sort(list, this.theNearestAttackableTargetSorter);
+            					break;
+            				}
             			}
             		}
             	}
-            	System.out.println("i still ran");
             	if(list.size() > 0)
             	{
             		this.targetEntity = (EntityLivingBase)list.get(0);
@@ -104,6 +120,25 @@ public class EntityAINearestModified extends EntityAITarget
             	return false;
             }
         }
+    }
+    private List loopEntities(List list)
+    {
+    	for(int i = 0; i < list.size(); i++)
+    	{
+    		if(list.get(i) instanceof EntityAnimal)
+    		{
+    			list.remove(i);
+    		}
+    		else if(list.get(i).getClass().equals(this.owner.getClass()))
+    		{
+    			list.remove(i);
+    		}
+    		else if(list.get(i) instanceof EntityVillager)
+    		{
+    			list.remove(i);
+    		}
+    	}
+    	return list;
     }
 
     /**
