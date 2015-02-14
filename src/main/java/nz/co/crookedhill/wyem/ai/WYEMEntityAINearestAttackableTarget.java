@@ -118,6 +118,10 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
      */
     public void startExecuting()
     {
+    	if(this.targetEntity != null && this.targetEntity instanceof EntityPlayer &&((EntityPlayer)this.targetEntity).inventory.armorInventory[3] != null && ((EntityPlayer)this.targetEntity).inventory.armorInventory[3].getItem() instanceof WYEMItemCrown && ((WYEMItemCrown)((EntityPlayer)this.targetEntity).inventory.armorInventory[3].getItem()).friendlyString == this.helmetName)
+    	{
+    		this.taskOwner.setAttackTarget(null);
+    	}
         this.taskOwner.setAttackTarget(this.targetEntity);
         super.startExecuting();
     }
