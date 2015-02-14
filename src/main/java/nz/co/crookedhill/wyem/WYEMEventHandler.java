@@ -5,6 +5,7 @@ import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAICreeperSwell;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.item.EntityItem;
@@ -15,14 +16,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import nz.co.crookedhill.wyem.ai.WYEMEntityAINearestAttackableTarget;
 import nz.co.crookedhill.wyem.item.WYEMItem;
-import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -75,7 +75,7 @@ public class WYEMEventHandler
 						foundClasses++;
 						if(foundClasses < 2 )
 						{
-							((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(zomb, EntityPlayer.class, 0, true, "zombie_crown");
+							((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(zomb, EntityPlayer.class, 0, true, "zombie_crown");
 						}
 					}
 				}
@@ -91,7 +91,14 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(crep, EntityPlayer.class, 0, true, "creeper_crown");
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(crep, EntityPlayer.class, 0, true, "creeper_crown");
+					}
+				}
+				if(list.get(i) instanceof EntityAICreeperSwell)
+				{
+					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAICreeperSwell)
+					{
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAICreeperSwell();
 					}
 				}
 			}
@@ -107,7 +114,7 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(skel, EntityPlayer.class, 0, true, "wither_crown");
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(skel, EntityPlayer.class, 0, true, "wither_crown");
 					}
 				}
 			}
@@ -123,7 +130,7 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(skel, EntityPlayer.class, 0, true, "skeleton_crown");
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(skel, EntityPlayer.class, 0, true, "skeleton_crown");
 					}
 				}
 			}

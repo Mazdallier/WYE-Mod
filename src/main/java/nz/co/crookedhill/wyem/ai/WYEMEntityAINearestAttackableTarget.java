@@ -1,4 +1,4 @@
-package nz.co.crookedhill.wyem;
+package nz.co.crookedhill.wyem.ai;
 
 /*
  * this class is an edited version of EntityAINearestAttackableTarget.
@@ -20,7 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 
-public class EntityAINearestModified extends EntityAITarget
+public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
 {
 	private EntityCreature owner;
 	private String helmetName;
@@ -36,18 +36,18 @@ public class EntityAINearestModified extends EntityAITarget
     private EntityLivingBase targetEntity;
     private static final String __OBFID = "CL_00001620";
 
-    public EntityAINearestModified(EntityCreature p_i1663_1_, Class p_i1663_2_, int p_i1663_3_, boolean p_i1663_4_, String hemletName)
+    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1663_1_, Class p_i1663_2_, int p_i1663_3_, boolean p_i1663_4_, String hemletName)
     {
         this(p_i1663_1_, p_i1663_2_, p_i1663_3_, p_i1663_4_, false);
         this.helmetName = hemletName;
     }
 
-    public EntityAINearestModified(EntityCreature p_i1664_1_, Class p_i1664_2_, int p_i1664_3_, boolean p_i1664_4_, boolean p_i1664_5_)
+    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1664_1_, Class p_i1664_2_, int p_i1664_3_, boolean p_i1664_4_, boolean p_i1664_5_)
     {
         this(p_i1664_1_, p_i1664_2_, p_i1664_3_, p_i1664_4_, p_i1664_5_, (IEntitySelector)null);
     }
 
-    public EntityAINearestModified(EntityCreature p_i1665_1_, Class p_i1665_2_, int p_i1665_3_, boolean p_i1665_4_, boolean p_i1665_5_, final IEntitySelector p_i1665_6_)
+    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1665_1_, Class p_i1665_2_, int p_i1665_3_, boolean p_i1665_4_, boolean p_i1665_5_, final IEntitySelector p_i1665_6_)
     {
         super(p_i1665_1_, p_i1665_4_, p_i1665_5_);
         this.owner = p_i1665_1_;
@@ -63,7 +63,7 @@ public class EntityAINearestModified extends EntityAITarget
              */
             public boolean isEntityApplicable(Entity p_82704_1_)
             {
-                return !(p_82704_1_ instanceof EntityLivingBase) ? false : (p_i1665_6_ != null && !p_i1665_6_.isEntityApplicable(p_82704_1_) ? false : EntityAINearestModified.this.isSuitableTarget((EntityLivingBase)p_82704_1_, false));
+                return !(p_82704_1_ instanceof EntityLivingBase) ? false : (p_i1665_6_ != null && !p_i1665_6_.isEntityApplicable(p_82704_1_) ? false : WYEMEntityAINearestAttackableTarget.this.isSuitableTarget((EntityLivingBase)p_82704_1_, false));
             }
         };
     }
