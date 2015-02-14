@@ -1,7 +1,7 @@
 [
 {
   "modid": "wyem",
-  "name": "WYE Mod",
+  "name": "WYEM",
   "description": "WYE (Wear Your Enemies) Minecraft Mod, create armor out of mobs in minecraft and get abilities from it.",
   "version": "${version}",
   "mcversion": "${mcversion}",

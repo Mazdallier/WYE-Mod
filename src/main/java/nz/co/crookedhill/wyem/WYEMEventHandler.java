@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.item.EntityItem;
@@ -14,12 +15,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.item.WYEMItem;
+import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -49,13 +52,12 @@ public class WYEMEventHandler
 			}
 		}	
 	}
-	
+
 	@SubscribeEvent
 	public void onJoinEvent(EntityJoinWorldEvent event)
 	{
 		if(event.entity instanceof EntityZombie)
 		{
-			System.out.println("a zombie joined the world");
 			EntityZombie zomb = (EntityZombie)event.entity;
 			List list = zomb.targetTasks.taskEntries;
 			/*
@@ -73,7 +75,6 @@ public class WYEMEventHandler
 						foundClasses++;
 						if(foundClasses < 2 )
 						{
-							System.out.println("removing old ai");
 							((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(zomb, EntityPlayer.class, 0, true, "zombie_crown");
 						}
 					}
@@ -82,7 +83,6 @@ public class WYEMEventHandler
 		}
 		if(event.entity instanceof EntityCreeper)
 		{
-			System.out.println("a zombie joined the world");
 			EntityCreeper crep = (EntityCreeper)event.entity;
 			List list = crep.targetTasks.taskEntries;
 			for(int i = 0; i < crep.targetTasks.taskEntries.size(); i++)
@@ -91,7 +91,6 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						System.out.println("removing old ai");
 						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(crep, EntityPlayer.class, 0, true, "creeper_crown");
 					}
 				}
@@ -100,7 +99,6 @@ public class WYEMEventHandler
 		/* if wither skeleton */
 		if(event.entity instanceof EntitySkeleton && ((EntitySkeleton)event.entity).getSkeletonType() == 1)
 		{
-			System.out.println("a zombie joined the world");
 			EntitySkeleton skel = (EntitySkeleton)event.entity;
 			List list = skel.targetTasks.taskEntries;
 			for(int i = 0; i < skel.targetTasks.taskEntries.size(); i++)
@@ -109,7 +107,6 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						System.out.println("removing old ai");
 						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(skel, EntityPlayer.class, 0, true, "wither_crown");
 					}
 				}
@@ -118,7 +115,6 @@ public class WYEMEventHandler
 		/* if regular skeleton */
 		if(event.entity instanceof EntitySkeleton && ((EntitySkeleton)event.entity).getSkeletonType() == 0)
 		{
-			System.out.println("a zombie joined the world");
 			EntitySkeleton skel = (EntitySkeleton)event.entity;
 			List list = skel.targetTasks.taskEntries;
 			for(int i = 0; i < skel.targetTasks.taskEntries.size(); i++)
@@ -127,7 +123,6 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						System.out.println("removing old ai");
 						((EntityAITaskEntry)list.get(i)).action = new EntityAINearestModified(skel, EntityPlayer.class, 0, true, "skeleton_crown");
 					}
 				}
@@ -138,28 +133,23 @@ public class WYEMEventHandler
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onHurtEvent(LivingHurtEvent event)
 	{
-		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer && event.entity.handleLavaMovement())
+		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer)
 		{
-			for(ItemStack item : ((EntityPlayer) event.entity).inventory.armorInventory)
+			EntityPlayer player = (EntityPlayer)event.entity;
+			if(event.source.getEntity() != null && event.source.getEntity() instanceof EntityLivingBase)
+				player.setLastAttacker(event.source.getEntity());
+			ItemStack[] armorInventory = player.inventory.armorInventory;
+			/*if the player is touching lava and is wearing an ender chestplate*/
+			if(player.handleLavaMovement() && armorInventory[2] != null && armorInventory[2].getItem() == WYEMItem.enderChestplate)
 			{
-				if(item != null && item.getItem() == WYEMItem.enderChestplate)
-				{
-					teleportFromDamage((EntityPlayer)event.entity);
-					item.attemptDamageItem(3, rand);
-					break;
-				}
+				teleportFromDamage((EntityPlayer)event.entity);
+				armorInventory[2].attemptDamageItem(3, rand);
 			}
-		}
-		else if(event.entity instanceof EntityPlayer && event.source.getDamageType() == "fall")
-		{
-			for(ItemStack item : ((EntityPlayer)event.entity).inventory.armorInventory)
+			/* if the player has been hurt by fall damage and is wearing spider treads */
+			else if(event.source.getDamageType() == "fall" && armorInventory[0] != null && armorInventory[0].getItem() == WYEMItem.spiderTreads)
 			{
-				if(item.getItem() == WYEMItem.spiderTreads)
-				{
-					event.ammount -= (event.ammount * WYEMConfigHelper.spiderDamageReduction);
-					item.attemptDamageItem(3, rand);
-					break;
-				}
+				event.ammount -= (event.ammount * WYEMConfigHelper.spiderDamageReduction);
+				armorInventory[0].attemptDamageItem(3, rand);
 			}
 		}
 	}
@@ -225,7 +215,7 @@ public class WYEMEventHandler
 		if(event.entity instanceof EntitySkeleton)
 		{
 			EntitySkeleton skel = (EntitySkeleton)event.entity;
-			 //0= skeleton, 1= wither skeleton 
+			//0= skeleton, 1= wither skeleton 
 			if(skel.getSkeletonType() == 0)
 			{
 				Entity target = skel.getAITarget();
@@ -241,7 +231,7 @@ public class WYEMEventHandler
 			}
 			else
 			{
-				 //If entity is a wither skeleton 
+				//If entity is a wither skeleton 
 				Entity target = skel.getAITarget();
 				if(target instanceof EntityPlayer)
 				{
@@ -270,7 +260,6 @@ public class WYEMEventHandler
 					}
 				}
 			}
-
 		}
 		else if (event.entity instanceof EntityCreeper)
 		{

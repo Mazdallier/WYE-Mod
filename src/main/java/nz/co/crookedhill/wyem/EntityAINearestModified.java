@@ -1,5 +1,11 @@
 package nz.co.crookedhill.wyem;
 
+/*
+ * this class is an edited version of EntityAINearestAttackableTarget.
+ * it functions as per normal, but removed any player from the possible
+ * attackees that is wearing the right MobCrown.
+ */
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -10,8 +16,6 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITarget;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import nz.co.crookedhill.wyem.item.WYEMItemCrown;
@@ -88,26 +92,13 @@ public class EntityAINearestModified extends EntityAITarget
             	{
             		if(list.get(i) instanceof EntityPlayer)
             		{
-        				System.out.println("I am an anoying message that is alwasy there!");
-
             			EntityPlayer player = (EntityPlayer)list.get(i);
             			ItemStack itemstack = player.inventory.armorInventory[3];
             			if(itemstack != null && itemstack.getItem() instanceof WYEMItemCrown)
             			{
             				if(((WYEMItemCrown)itemstack.getItem()).friendlyString.equals(helmetName))
             				{
-            					list = this.taskOwner.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, ((EntityPlayer)list.get(i)).boundingBox.expand(d0, 4.0D, d0));
-            					for(int j = 0; j < list.size(); j++)
-            					{
-            						if(list.get(j).equals(player))
-            						{
-            							list.remove(j);
-            							break;
-            						}
-            					}
-            					loopEntities(list);
-                	            Collections.sort(list, this.theNearestAttackableTargetSorter);
-            					break;
+            					list.remove(i);
             				}
             			}
             		}
@@ -120,25 +111,6 @@ public class EntityAINearestModified extends EntityAITarget
             	return false;
             }
         }
-    }
-    private List loopEntities(List list)
-    {
-    	for(int i = 0; i < list.size(); i++)
-    	{
-    		if(list.get(i) instanceof EntityAnimal)
-    		{
-    			list.remove(i);
-    		}
-    		else if(list.get(i).getClass().equals(this.owner.getClass()))
-    		{
-    			list.remove(i);
-    		}
-    		else if(list.get(i) instanceof EntityVillager)
-    		{
-    			list.remove(i);
-    		}
-    	}
-    	return list;
     }
 
     /**
@@ -153,8 +125,7 @@ public class EntityAINearestModified extends EntityAITarget
     public static class Sorter implements Comparator
         {
             private final Entity theEntity;
-            private static final String __OBFID = "CL_00001622";
-
+            
             public Sorter(Entity p_i1662_1_)
             {
                 this.theEntity = p_i1662_1_;
