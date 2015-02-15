@@ -19,100 +19,93 @@ public class WYEMEntityAIOwnerHurtTarget extends EntityAITarget
 {
 
 	EntityLivingBase taskOwner;
+	EntityLivingBase king;
 	Item friendlyHelmet;
-    EntityLivingBase theTarget;
-    private int field_142050_e;
-    private final EntityAINearestAttackableTarget.Sorter theNearestAttackableTargetSorter;
+	EntityLivingBase theTarget;
+	private int field_142050_e;
+	private final EntityAINearestAttackableTarget.Sorter theNearestAttackableTargetSorter;
 
-    public WYEMEntityAIOwnerHurtTarget(EntityCreature owner, Item crown)
-    {
-        super(owner, false);
-        this.taskOwner = owner;
-        this.friendlyHelmet = crown;
-        this.setMutexBits(1);
-    }
+	public WYEMEntityAIOwnerHurtTarget(EntityCreature owner, Item crown)
+	{
+		super(owner, false);
+		this.taskOwner = owner;
+		this.friendlyHelmet = crown;
+		this.setMutexBits(1);
+	}
 
-    /**
-     * Returns whether the EntityAIBase should begin execution.
-     */
-    public boolean shouldExecute()
-    {
-        List<EntityPlayer> list = ((List<EntityPlayer>)this.taskOwner.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.taskOwner.boundingBox.expand(16, 4.0D, 16)));
-        
-        for(EntityPlayer player : list)
-        {
-        	if(player.inventory.armorInventory[3] == null || player.inventory.armorInventory[3].getItem() != this.friendlyHelmet)
-        	{
-        		list.remove(player);
-        	}
-        }
-        if(list.size() > 0)
-        {
-        	Collections.sort(list, this.theNearestAttackableTargetSorter);
-        	//TODO: if the nearest player has attacked, attack that target.
-        }
-        return false;
-        
-        if (!this.theEntityTameable.isTamed())
-        {
-            return false;
-        }
-        else
-        {
-            EntityLivingBase entitylivingbase = this.theEntityTameable.getOwner();
+	/**
+	 * Returns whether the EntityAIBase should begin execution.
+	 */
+	public boolean shouldExecute()
+	{
+		List<EntityPlayer> list = ((List<EntityPlayer>)this.taskOwner.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.taskOwner.boundingBox.expand(16, 4.0D, 16)));
 
-            if (entitylivingbase == null)
-            {
-                return false;
-            }
-            else
-            {
-                this.theTarget = entitylivingbase.getLastAttacker();
-                int i = entitylivingbase.getLastAttackerTime();
-                return i != this.field_142050_e && this.isSuitableTarget(this.theTarget, false) && this.theEntityTameable.func_142018_a(this.theTarget, entitylivingbase);
-            }
-        }
-    }
+		for(EntityPlayer player : list)
+		{
+			if(player.inventory.armorInventory[3] == null || player.inventory.armorInventory[3].getItem() != this.friendlyHelmet)
+			{
+				list.remove(player);
+			}
+		}
+		if(list.size() > 0)
+		{
+			Collections.sort(list, this.theNearestAttackableTargetSorter);
+			for(EntityPlayer player : list)
+			{
+				EntityLivingBase attacker = player.getLastAttacker();
+				if(attacker == null)
+				{
+					continue;
+				}
+				this.theTarget = attacker;
+				int i = attacker.getLastAttackerTime();
+				return i != this.field_142050_e && this.isSuitableTarget(this.theTarget, false);
+				break;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-    /**
-     * Execute a one shot task or start executing a continuous task
-     */
-    public void startExecuting()
-    {
-        this.taskOwner.setAttackTarget(this.theTarget);
-        EntityLivingBase entitylivingbase = this.theEntityTameable.getOwner();
+	/**
+	 * Execute a one shot task or start executing a continuous task
+	 */
+	public void startExecuting()
+	{
+		((EntityCreature)this.taskOwner).setAttackTarget(this.theTarget);
+		EntityLivingBase entitylivingbase = this.king;
 
-        if (entitylivingbase != null)
-        {
-            this.field_142050_e = entitylivingbase.getLastAttackerTime();
-        }
+		if (entitylivingbase != null)
+		{
+			this.field_142050_e = entitylivingbase.getLastAttackerTime();
+		}
 
-        super.startExecuting();
-    }
-    
-    public static class Sorter implements Comparator
-    {
-        private final Entity theEntity;
-        
-        public Sorter(Entity p_i1662_1_)
-        {
-            this.theEntity = p_i1662_1_;
-        }
+		super.startExecuting();
+	}
 
-        public int compare(Entity p_compare_1_, Entity p_compare_2_)
-        {
-            double d0 = this.theEntity.getDistanceSqToEntity(p_compare_1_);
-            double d1 = this.theEntity.getDistanceSqToEntity(p_compare_2_);
-            return d0 < d1 ? -1 : (d0 > d1 ? 1 : 0);
-        }
+	public static class Sorter implements Comparator
+	{
+		private final Entity theEntity;
 
-        public int compare(Object p_compare_1_, Object p_compare_2_)
-        {
-            return this.compare((Entity)p_compare_1_, (Entity)p_compare_2_);
-        }
-    }
+		public Sorter(Entity p_i1662_1_)
+		{
+			this.theEntity = p_i1662_1_;
+		}
 
+		public int compare(Entity p_compare_1_, Entity p_compare_2_)
+		{
+			double d0 = this.theEntity.getDistanceSqToEntity(p_compare_1_);
+			double d1 = this.theEntity.getDistanceSqToEntity(p_compare_2_);
+			return d0 < d1 ? -1 : (d0 > d1 ? 1 : 0);
+		}
 
-}
+		public int compare(Object p_compare_1_, Object p_compare_2_)
+		{
+			return this.compare((Entity)p_compare_1_, (Entity)p_compare_2_);
+		}
+	}
+
 
 }
