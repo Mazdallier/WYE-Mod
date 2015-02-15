@@ -22,7 +22,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class WYEM
 {
 	public static final String MODID = "wyem";
-	public static final String VERSION = "0.1.0.2";
+	public static final String VERSION = "0.1.0.5";
 	
 	@SidedProxy(clientSide="nz.co.crookedhill.wyem.proxy.ClientProxy", serverSide="nz.co.crookedhill.wyem.proxy.CommonProxy")
 	public static ClientProxy proxy;
