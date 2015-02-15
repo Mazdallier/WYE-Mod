@@ -149,7 +149,7 @@ public class WYEMEventHandler
 			EntityPlayer player = (EntityPlayer)event.entity;
 			
 			//TODO remove this on release
-			event.setCanceled(true);
+			//event.setCanceled(true);
 
 			if(event.source.getEntity() != null && event.source.getEntity() instanceof EntityLivingBase)
 				player.setLastAttacker(event.source.getEntity());

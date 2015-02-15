@@ -181,6 +181,10 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
     		{
     			itr.remove();
     		}
+    		else if(entity.getClass() == this.taskOwner.getClass())
+    		{
+    			itr.remove();
+    		}
     	}
     	Collections.sort(list, this.theNearestAttackableTargetSorter);
     	return list;
