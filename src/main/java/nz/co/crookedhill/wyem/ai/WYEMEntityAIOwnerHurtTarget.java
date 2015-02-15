@@ -2,6 +2,7 @@ package nz.co.crookedhill.wyem.ai;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.command.IEntitySelector;
@@ -31,6 +32,7 @@ public class WYEMEntityAIOwnerHurtTarget extends EntityAITarget
 		this.taskOwner = owner;
 		this.friendlyHelmet = crown;
 		this.setMutexBits(1);
+		this.theNearestAttackableTargetSorter = new EntityAINearestAttackableTarget.Sorter(owner);
 	}
 
 	/**
@@ -38,9 +40,11 @@ public class WYEMEntityAIOwnerHurtTarget extends EntityAITarget
 	 */
 	public boolean shouldExecute()
 	{
-		List<EntityPlayer> list = ((List<EntityPlayer>)this.taskOwner.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.taskOwner.boundingBox.expand(16, 4.0D, 16)));
+		List<EntityPlayer> list = this.taskOwner.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.taskOwner.boundingBox.expand(16, 4.0D, 16));
+		EntityPlayer[] players = new EntityPlayer[list.size()];
+		players = list.toArray(players);
 
-		for(EntityPlayer player : list)
+		for(EntityPlayer player : players)
 		{
 			if(player.inventory.armorInventory[3] == null || player.inventory.armorInventory[3].getItem() != this.friendlyHelmet)
 			{
@@ -50,23 +54,19 @@ public class WYEMEntityAIOwnerHurtTarget extends EntityAITarget
 		if(list.size() > 0)
 		{
 			Collections.sort(list, this.theNearestAttackableTargetSorter);
-			for(EntityPlayer player : list)
+			players = list.toArray(players);
+			for(EntityPlayer player : players)
 			{
-				EntityLivingBase attacker = player.getLastAttacker();
-				if(attacker == null)
+				if(player.getLastAttacker() == null)
 				{
 					continue;
 				}
-				this.theTarget = attacker;
-				int i = attacker.getLastAttackerTime();
+				this.theTarget = player.getLastAttacker();
+				int i = player.getLastAttacker().getLastAttackerTime();
 				return i != this.field_142050_e && this.isSuitableTarget(this.theTarget, false);
-				break;
 			}
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	/**
@@ -75,6 +75,7 @@ public class WYEMEntityAIOwnerHurtTarget extends EntityAITarget
 	public void startExecuting()
 	{
 		((EntityCreature)this.taskOwner).setAttackTarget(this.theTarget);
+		System.out.println("attacking: " + this.theTarget.toString());
 		EntityLivingBase entitylivingbase = this.king;
 
 		if (entitylivingbase != null)

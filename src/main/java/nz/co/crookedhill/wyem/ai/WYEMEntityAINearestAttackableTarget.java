@@ -8,6 +8,7 @@ package nz.co.crookedhill.wyem.ai;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.command.IEntitySelector;
@@ -16,14 +17,17 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITarget;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 
 public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
 {
 	private EntityCreature owner;
-	private String helmetName;
+	private Item crown;
     private final Class targetClass;
     private final int targetChance;
     /** Instance of EntityAINearestAttackableTargetSorter. */
@@ -34,12 +38,11 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
      */
     private final IEntitySelector targetEntitySelector;
     private EntityLivingBase targetEntity;
-    private static final String __OBFID = "CL_00001620";
 
-    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1663_1_, Class p_i1663_2_, int p_i1663_3_, boolean p_i1663_4_, String hemletName)
+    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1663_1_, Class p_i1663_2_, int p_i1663_3_, boolean p_i1663_4_, Item crown)
     {
         this(p_i1663_1_, p_i1663_2_, p_i1663_3_, p_i1663_4_, false);
-        this.helmetName = hemletName;
+        this.crown = crown;
     }
 
     public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1664_1_, Class p_i1664_2_, int p_i1664_3_, boolean p_i1664_4_, boolean p_i1664_5_)
@@ -88,18 +91,22 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
             }
             else
             {
-            	for(int i = 0; i < list.size(); i++)
+            	for(Object entities : list)
             	{
-            		if(list.get(i) instanceof EntityPlayer)
+            		if(entities instanceof EntityPlayer)
             		{
-            			EntityPlayer player = (EntityPlayer)list.get(i);
+            			EntityPlayer player = (EntityPlayer)entities;
             			ItemStack itemstack = player.inventory.armorInventory[3];
-            			if(itemstack != null && itemstack.getItem() instanceof WYEMItemCrown)
+            			if(itemstack != null && itemstack.getItem() == this.crown)
             			{
-            				if(((WYEMItemCrown)itemstack.getItem()).friendlyString.equals(helmetName))
+            				//list.remove(player);
+            				List toAttack = getCrownsEnemies(list);
+            				if(toAttack.isEmpty())
             				{
-            					list.remove(i);
+            					return false;
             				}
+            				this.targetEntity = (EntityLivingBase)toAttack.get(0);
+            				return true;
             			}
             		}
             	}
@@ -118,7 +125,7 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
      */
     public void startExecuting()
     {
-    	if(this.targetEntity != null && this.targetEntity instanceof EntityPlayer &&((EntityPlayer)this.targetEntity).inventory.armorInventory[3] != null && ((EntityPlayer)this.targetEntity).inventory.armorInventory[3].getItem() instanceof WYEMItemCrown && ((WYEMItemCrown)((EntityPlayer)this.targetEntity).inventory.armorInventory[3].getItem()).friendlyString == this.helmetName)
+    	if(this.targetEntity != null && this.targetEntity instanceof EntityPlayer &&((EntityPlayer)this.targetEntity).inventory.armorInventory[3] != null && ((EntityPlayer)this.targetEntity).inventory.armorInventory[3].getItem() instanceof WYEMItemCrown && ((EntityPlayer)this.targetEntity).inventory.armorInventory[3].getItem() == this.crown)
     	{
     		this.taskOwner.setAttackTarget(null);
     	}
@@ -147,6 +154,35 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
                 return this.compare((Entity)p_compare_1_, (Entity)p_compare_2_);
             }
         }
-
-	
+    private List getCrownsEnemies(List list)
+    {
+        double dis = this.getTargetDistance();
+    	list = this.taskOwner.worldObj.getEntitiesWithinAABBExcludingEntity(this.taskOwner, this.taskOwner.boundingBox.expand(dis, 4.0D, dis));
+    	Iterator itr = list.iterator();
+    	while(itr.hasNext())
+    	{
+    		Object entity = itr.next();
+    		if(entity instanceof EntityPlayer)
+    		{
+    			if(((EntityPlayer)entity).inventory.armorInventory[3] != null && ((EntityPlayer)entity).inventory.armorInventory[3].getItem() == this.crown)
+    			{
+    				itr.remove();
+    			}
+    		}
+    		else if(entity instanceof EntityAnimal)
+    		{
+    			itr.remove();
+    		}
+    		else if(entity instanceof EntityVillager)
+    		{
+    			itr.remove();
+    		}
+    		else if(!(entity instanceof EntityLivingBase))
+    		{
+    			itr.remove();
+    		}
+    	}
+    	Collections.sort(list, this.theNearestAttackableTargetSorter);
+    	return list;
+    }
 }

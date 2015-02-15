@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAICreeperSwell;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -23,7 +24,6 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import nz.co.crookedhill.wyem.ai.WYEMEntityAICreeperSwell;
 import nz.co.crookedhill.wyem.ai.WYEMEntityAINearestAttackableTarget;
-import nz.co.crookedhill.wyem.ai.WYEMEntityAIOwnerHurtTarget;
 import nz.co.crookedhill.wyem.item.WYEMItem;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -61,7 +61,7 @@ public class WYEMEventHandler
 			EntityZombie zomb = (EntityZombie)event.entity;
 			List list = zomb.targetTasks.taskEntries;
 			
-			zomb.targetTasks.addTask(1, new WYEMEntityAIOwnerHurtTarget(zomb, WYEMItem.zombieCrown));
+			//zomb.targetTasks.addTask(1, new WYEMEntityAIOwnerHurtTarget(zomb, WYEMItem.zombieCrown));
 			/*
 			 * this exists because there are 2 instances of the object we want to replace, but the 
 			 * one we want to replace was added first, this is used to stop the replacement of the second.
@@ -77,7 +77,7 @@ public class WYEMEventHandler
 						foundClasses++;
 						if(foundClasses < 2 )
 						{
-							((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(zomb, EntityPlayer.class, 0, true, "zombie_crown");
+							((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(zomb, EntityPlayer.class, 0, true, WYEMItem.zombieCrown);
 						}
 					}
 				}
@@ -86,6 +86,7 @@ public class WYEMEventHandler
 		if(event.entity instanceof EntityCreeper)
 		{
 			EntityCreeper crep = (EntityCreeper)event.entity;
+			//crep.targetTasks.addTask(1, new WYEMEntityAIOwnerHurtTarget(crep, WYEMItem.creeperCrown));
 			List list = crep.targetTasks.taskEntries;
 			for(int i = 0; i < crep.targetTasks.taskEntries.size(); i++)
 			{
@@ -93,7 +94,7 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(crep, EntityPlayer.class, 0, true, "creeper_crown");
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(crep, EntityPlayer.class, 0, true, WYEMItem.creeperCrown);
 					}
 				}
 				if(list.get(i) instanceof EntityAICreeperSwell)
@@ -116,7 +117,7 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(skel, EntityPlayer.class, 0, true, "wither_crown");
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(skel, EntityPlayer.class, 0, true, WYEMItem.witherCrown);
 					}
 				}
 			}
@@ -125,6 +126,7 @@ public class WYEMEventHandler
 		if(event.entity instanceof EntitySkeleton && ((EntitySkeleton)event.entity).getSkeletonType() == 0)
 		{
 			EntitySkeleton skel = (EntitySkeleton)event.entity;
+			//skel.targetTasks.addTask(1, new WYEMEntityAIOwnerHurtTarget(skel, WYEMItem.skeletonCrown));
 			List list = skel.targetTasks.taskEntries;
 			for(int i = 0; i < skel.targetTasks.taskEntries.size(); i++)
 			{
@@ -132,7 +134,7 @@ public class WYEMEventHandler
 				{
 					if(((EntityAITaskEntry)list.get(i)).action instanceof EntityAINearestAttackableTarget)
 					{
-						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(skel, EntityPlayer.class, 0, true, "skeleton_crown");
+						((EntityAITaskEntry)list.get(i)).action = new WYEMEntityAINearestAttackableTarget(skel, EntityPlayer.class, 0, true, WYEMItem.skeletonCrown);
 					}
 				}
 			}
@@ -145,6 +147,10 @@ public class WYEMEventHandler
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer)
 		{
 			EntityPlayer player = (EntityPlayer)event.entity;
+			
+			//TODO remove this on release
+			event.setCanceled(true);
+
 			if(event.source.getEntity() != null && event.source.getEntity() instanceof EntityLivingBase)
 				player.setLastAttacker(event.source.getEntity());
 			ItemStack[] armorInventory = player.inventory.armorInventory;
@@ -166,7 +172,7 @@ public class WYEMEventHandler
 	@SubscribeEvent
 	public void onDeathEvent(LivingDeathEvent event)
 	{
-		if(event.source.getEntity() instanceof EntityPlayer && ((EntityPlayer)event.source.getEntity()).getHeldItem().getItem() == WYEMItem.headCollector)
+		if(event.source.getEntity() instanceof EntityPlayer && ((EntityPlayer)event.source.getEntity()).getHeldItem() != null && ((EntityPlayer)event.source.getEntity()).getHeldItem().getItem() == WYEMItem.headCollector)
 		{
 			double chance = rand.nextDouble();
 			if(chance <= WYEMConfigHelper.headCollectorChance - 0.025D)
