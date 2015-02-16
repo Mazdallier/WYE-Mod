@@ -10,9 +10,24 @@ import net.minecraft.entity.ai.EntityAICreeperSwell;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityBlaze;
+import net.minecraft.entity.monster.EntityCaveSpider;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntitySlime;
+import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityChicken;
+import net.minecraft.entity.passive.EntityCow;
+import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.entity.passive.EntityPig;
+import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.passive.EntitySquid;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -60,7 +75,7 @@ public class WYEMEventHandler
 		{
 			EntityZombie zomb = (EntityZombie)event.entity;
 			List list = zomb.targetTasks.taskEntries;
-			
+
 			//zomb.targetTasks.addTask(1, new WYEMEntityAIOwnerHurtTarget(zomb, WYEMItem.zombieCrown));
 			/*
 			 * this exists because there are 2 instances of the object we want to replace, but the 
@@ -147,7 +162,7 @@ public class WYEMEventHandler
 		if(!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer)
 		{
 			EntityPlayer player = (EntityPlayer)event.entity;
-			
+
 			//TODO remove this on release
 			//event.setCanceled(true);
 
@@ -185,45 +200,109 @@ public class WYEMEventHandler
 						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 1));
 						event.entity.worldObj.spawnEntityInWorld(item);
 					}
+					else
+					{
+						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 0));
+						event.entity.worldObj.spawnEntityInWorld(item);
+					}
 				}
-				if(rand.nextDouble() <= WYEMConfigHelper.headCollectorChance)
+				else if(event.entity instanceof EntityZombie)
 				{
-					if(event.entity instanceof EntitySkeleton)
-					{
-						EntitySkeleton skele = (EntitySkeleton)event.entity;
-						/* is normal skeleton */
-						if(((EntitySkeleton)event.entity).getSkeletonType() == 0)
-						{
-							EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 0));
-							event.entity.worldObj.spawnEntityInWorld(item);
-						}
-						/* is wither skeleton */
-					}
-					else if(event.entity instanceof EntityZombie)
-					{
-						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 2));
-						event.entity.worldObj.spawnEntityInWorld(item);
-					}
-					else if(event.entity instanceof EntityCreeper)
-					{
-						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 4));
-						event.entity.worldObj.spawnEntityInWorld(item);
-					}
-					else if(event.entity instanceof EntityPlayer)
-					{
-						EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 3));
-						if(!item.getEntityItem().hasTagCompound())
-						{
-							item.getEntityItem().stackTagCompound = new NBTTagCompound();
-						}
-						item.getEntityItem().getTagCompound().setString("SkullOwner", ((EntityPlayer)event.source.getEntity()).getDisplayName());
-						event.entity.worldObj.spawnEntityInWorld(item);
-					}
+					EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 2));
+					event.entity.worldObj.spawnEntityInWorld(item);
+				}
+				else if(event.entity instanceof EntityCreeper)
+				{
+					EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 4));
+					event.entity.worldObj.spawnEntityInWorld(item);
+				}
+				
+				
+				else if(event.entity instanceof EntityBlaze)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Blaze"));
+				}
+				else if(event.entity instanceof EntityCaveSpider)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_CaveSpider"));
+				}
+				else if(event.entity instanceof EntityChicken)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Chicken"));
+				}
+				else if(event.entity instanceof EntityCow)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Cow"));
+				}
+				else if(event.entity instanceof EntityEnderman)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Enderman"));
+				}
+				else if(event.entity instanceof EntityGhast)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Ghast"));
+				}
+				else if(event.entity instanceof EntityIronGolem)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Golem"));
+				}
+				else if(event.entity instanceof EntityMagmaCube)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_LavaSlime"));
+				}
+				else if(event.entity instanceof EntityOcelot)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Ocelot"));
+				}
+				else if(event.entity instanceof EntityPig)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Pig"));
+				}
+				else if(event.entity instanceof EntitySheep)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Sheep"));
+				}
+				else if(event.entity instanceof EntitySlime)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Slime"));
+				}
+				else if(event.entity instanceof EntitySpider)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Spider"));
+				}
+				else if(event.entity instanceof EntitySquid)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Squid"));
+				}
+				else if(event.entity instanceof EntityVillager)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, "MHF_Villager"));
+				}				
+				else if(event.entity instanceof EntityPlayer)
+				{
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, ((EntityPlayer)event.source.getEntity()).getDisplayName()));
 				}
 			}
 
 		}
 	}
+	/**
+	 * returns an EntityItem of a skull with the skin of the string specified.
+	 * @param event
+	 * @param skinName
+	 * @return
+	 */
+	private EntityItem getCustomHead(LivingDeathEvent event, String skinName)
+	{
+		EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 3));
+		if(!item.getEntityItem().hasTagCompound())
+		{
+			item.getEntityItem().stackTagCompound = new NBTTagCompound();
+		}
+		item.getEntityItem().getTagCompound().setString("SkullOwner", skinName);
+		return item;
+	}
+	
 	@SubscribeEvent
 	public void onLivingEvent(LivingUpdateEvent event)
 	{
