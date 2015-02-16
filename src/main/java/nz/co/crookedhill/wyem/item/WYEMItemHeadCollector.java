@@ -11,6 +11,6 @@ public class WYEMItemHeadCollector extends ItemSword
 		super(EnumHelper.addToolMaterial("wyemtool", 500, 500, 500, 1, 25));
 		this.setCreativeTab(WYEM.tabWyem);
 		this.setUnlocalizedName(unlocolizedName);
-		this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
+		//this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
 	}
 }

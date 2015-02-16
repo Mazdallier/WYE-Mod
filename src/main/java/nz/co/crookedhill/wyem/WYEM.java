@@ -2,27 +2,29 @@ package nz.co.crookedhill.wyem;
 
 import java.io.File;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import nz.co.crookedhill.wyem.item.WYEMItem;
 import nz.co.crookedhill.wyem.proxy.ClientProxy;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @Mod(modid = WYEM.MODID, version = WYEM.VERSION)
 public class WYEM
 {
 	public static final String MODID = "wyem";
-	public static final String VERSION = "0.1.1.1";
+	public static final String VERSION = "1.0.0.0";
 	
 	@SidedProxy(clientSide="nz.co.crookedhill.wyem.proxy.ClientProxy", serverSide="nz.co.crookedhill.wyem.proxy.CommonProxy")
 	public static ClientProxy proxy;
@@ -30,7 +32,7 @@ public class WYEM
 	@Instance("wyem")
 	public static WYEM instance;
 
-	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
+	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", WYEM.MODID + "zombieCrown", 15, new int[] {1, 3, 2, 1}, 25);
 	//Use a custom item as an icon (assuming it is instantiated in a class called ModItems)
 	public static CreativeTabs tabWyem = new CreativeTabs("tabWYEM") {
 	    @Override
@@ -52,5 +54,13 @@ public class WYEM
 		WYEMItem.init();
 		MinecraftForge.EVENT_BUS.register(new WYEMEventHandler());
 		proxy.init();
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.headCollector, 0, new ModelResourceLocation("wyem:head_collector", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.creeperCrown, 0, new ModelResourceLocation("wyem:creeper_helmet", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.enderChestplate, 0, new ModelResourceLocation("wyem:ender_chestplate", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.skeletonCrown, 0, new ModelResourceLocation("wyem:skeleton_helmet", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.spiderTreads, 0, new ModelResourceLocation("wyem:spider_boots", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.witherCrown, 0, new ModelResourceLocation("wyem:wither_helmet", "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(WYEMItem.zombieCrown, 0, new ModelResourceLocation("wyem:zombie_helmet", "inventory"));
+		
 	}
 }
