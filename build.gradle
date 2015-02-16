@@ -22,7 +22,7 @@ group= "nz.co.crookedhill.wyem" // http://maven.apache.org/guides/mini/guide-nam
 archivesBaseName = "wyem"
 
 minecraft {
-    version = "1.7.10-10.13.2.1291"
+    version = "1.8-11.14.0.1299"
     runDir = "eclipse"
 }
 
