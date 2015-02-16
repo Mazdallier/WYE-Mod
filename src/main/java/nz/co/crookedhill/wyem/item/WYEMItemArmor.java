@@ -13,7 +13,7 @@ public class WYEMItemArmor extends ItemArmor
 	{
 		super(material, 0, type);
 		this.setUnlocalizedName(unlocolizedName);
-		this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
+		//this.setTextureName(WYEM.MODID + ":" + unlocolizedName);
 		this.textureName = textureName;
 		this.setCreativeTab(WYEM.tabWyem);
 	}

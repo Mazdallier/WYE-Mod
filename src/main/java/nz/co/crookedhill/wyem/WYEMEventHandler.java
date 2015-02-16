@@ -3,6 +3,7 @@ package nz.co.crookedhill.wyem;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,16 +33,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import nz.co.crookedhill.wyem.ai.WYEMEntityAICreeperSwell;
 import nz.co.crookedhill.wyem.ai.WYEMEntityAINearestAttackableTarget;
 import nz.co.crookedhill.wyem.item.WYEMItem;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class WYEMEventHandler 
 {
@@ -170,7 +173,7 @@ public class WYEMEventHandler
 				player.setLastAttacker(event.source.getEntity());
 			ItemStack[] armorInventory = player.inventory.armorInventory;
 			/*if the player is touching lava and is wearing an ender chestplate*/
-			if(player.handleLavaMovement() && armorInventory[2] != null && armorInventory[2].getItem() == WYEMItem.enderChestplate)
+			if(playerIsInLava(player) && armorInventory[2] != null && armorInventory[2].getItem() == WYEMItem.enderChestplate)
 			{
 				teleportFromDamage((EntityPlayer)event.entity);
 				armorInventory[2].attemptDamageItem(3, rand);
@@ -182,6 +185,11 @@ public class WYEMEventHandler
 				armorInventory[0].attemptDamageItem(3, rand);
 			}
 		}
+	}
+	
+	private boolean playerIsInLava(EntityPlayer player)
+	{
+		return player.worldObj.handleMaterialAcceleration(player.getEntityBoundingBox().expand(0.0D, -0.4000000059604645D, 0.0D).contract(0.001D, 0.001D, 0.001D), Material.water, player);
 	}
 
 	@SubscribeEvent
@@ -280,7 +288,7 @@ public class WYEMEventHandler
 				}				
 				else if(event.entity instanceof EntityPlayer)
 				{
-					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, ((EntityPlayer)event.source.getEntity()).getDisplayName()));
+					event.entity.worldObj.spawnEntityInWorld(getCustomHead(event, ((EntityPlayer)event.source.getEntity()).getDisplayName().getUnformattedText()));
 				}
 			}
 
@@ -297,7 +305,7 @@ public class WYEMEventHandler
 		EntityItem item = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, new ItemStack(Items.skull, 1, 3));
 		if(!item.getEntityItem().hasTagCompound())
 		{
-			item.getEntityItem().stackTagCompound = new NBTTagCompound();
+			item.getEntityItem().setTagCompound(new NBTTagCompound());
 		}
 		item.getEntityItem().getTagCompound().setString("SkullOwner", skinName);
 		return item;
@@ -319,7 +327,7 @@ public class WYEMEventHandler
 				/* Spawn particles around player when wearing ender chestplate */
 				for (int k = 0; k < 2; ++k)
 				{
-					player.worldObj.spawnParticle("portal", player.posX + (this.rand.nextDouble() - 0.5D) * (double)player.width, player.posY + this.rand.nextDouble() * (double)player.height - 0.25D, player.posZ + (this.rand.nextDouble() - 0.5D) * (double)player.width, (this.rand.nextDouble() - 0.5D) * 2.0D, -this.rand.nextDouble(), (this.rand.nextDouble() - 0.5D) * 2.0D);
+					player.worldObj.spawnParticle(EnumParticleTypes.PORTAL, player.posX + (this.rand.nextDouble() - 0.5D) * (double)player.width, player.posY + this.rand.nextDouble() * (double)player.height - 0.25D, player.posZ + (this.rand.nextDouble() - 0.5D) * (double)player.width, (this.rand.nextDouble() - 0.5D) * 2.0D, -this.rand.nextDouble(), (this.rand.nextDouble() - 0.5D) * 2.0D);
 				}
 			}
 		}
@@ -335,7 +343,7 @@ public class WYEMEventHandler
 					ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
 					if(item != null && item.getItem().getUnlocalizedName().contains("skeleton_crown"));
 					{
-						skel.setTarget(null);
+						skel.setAttackTarget(null);
 						skel.setRevengeTarget(null);
 					}
 				}
@@ -349,7 +357,7 @@ public class WYEMEventHandler
 					ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
 					if(item != null && item.getItem().getUnlocalizedName().contains("wither_crown"));
 					{
-						skel.setTarget(null);
+						skel.setAttackTarget(null);
 						skel.setRevengeTarget(null);
 					}
 				}
@@ -366,7 +374,7 @@ public class WYEMEventHandler
 					ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
 					if(item != null && item.getItem().getUnlocalizedName().contains("zombie_crown"));
 					{
-						zomb.setTarget(null);
+						zomb.setAttackTarget(null);
 						zomb.setRevengeTarget(null);
 					}
 				}
@@ -381,7 +389,7 @@ public class WYEMEventHandler
 				ItemStack item = ((EntityPlayer) target).inventory.armorInventory[3];
 				if(item != null && item.getItem().getUnlocalizedName().contains("creeper_crown"));
 				{
-					crep.setTarget(null);
+					crep.setAttackTarget(null);
 					crep.setRevengeTarget(null);
 				}
 			}
@@ -393,7 +401,7 @@ public class WYEMEventHandler
 		double xpos = ((player.posX-5.0d) + (double)rand.nextInt(10));
 		double ypos = ((player.posY-5.0d) + (double)rand.nextInt(10));
 		double zpos = ((player.posZ-5.0d) + (double)rand.nextInt(10));
-		while(!player.worldObj.isAirBlock((int)xpos, (int)ypos, (int)zpos))
+		while(!player.worldObj.isAirBlock(new BlockPos(xpos, ypos, zpos)))
 		{
 			ypos += 1.0d;
 		}

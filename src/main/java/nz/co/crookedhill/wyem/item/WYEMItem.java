@@ -3,8 +3,8 @@ package nz.co.crookedhill.wyem.item;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import nz.co.crookedhill.wyem.WYEM;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 public class WYEMItem 
 {

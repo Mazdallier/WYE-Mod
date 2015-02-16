@@ -25,6 +25,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import nz.co.crookedhill.wyem.item.WYEMItemCrown;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+
 public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
 {
 	private EntityCreature owner;
@@ -37,7 +40,7 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
      * This filter is applied to the Entity search.  Only matching entities will be targetted.  (null -> no
      * restrictions)
      */
-    private final IEntitySelector targetEntitySelector;
+    private final Predicate targetEntitySelector;
     private EntityLivingBase targetEntity;
 
     public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1663_1_, Class p_i1663_2_, int p_i1663_3_, boolean p_i1663_4_, Item crown)
@@ -48,10 +51,10 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
 
     public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1664_1_, Class p_i1664_2_, int p_i1664_3_, boolean p_i1664_4_, boolean p_i1664_5_)
     {
-        this(p_i1664_1_, p_i1664_2_, p_i1664_3_, p_i1664_4_, p_i1664_5_, (IEntitySelector)null);
+        this(p_i1664_1_, p_i1664_2_, p_i1664_3_, p_i1664_4_, p_i1664_5_, (Predicate)null);
     }
 
-    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1665_1_, Class p_i1665_2_, int p_i1665_3_, boolean p_i1665_4_, boolean p_i1665_5_, final IEntitySelector p_i1665_6_)
+    public WYEMEntityAINearestAttackableTarget(EntityCreature p_i1665_1_, Class p_i1665_2_, int p_i1665_3_, boolean p_i1665_4_, boolean p_i1665_5_, final Predicate p_i45880_6_)
     {
         super(p_i1665_1_, p_i1665_4_, p_i1665_5_);
         this.owner = p_i1665_1_;
@@ -59,15 +62,50 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
         this.targetChance = p_i1665_3_;
         this.theNearestAttackableTargetSorter = new EntityAINearestAttackableTarget.Sorter(p_i1665_1_);
         this.setMutexBits(1);
-        this.targetEntitySelector = new IEntitySelector()
+        this.targetEntitySelector = new Predicate()
         {
             private static final String __OBFID = "CL_00001621";
-            /**
-             * Return whether the specified entity is applicable to this filter.
-             */
-            public boolean isEntityApplicable(Entity p_82704_1_)
+            public boolean func_179878_a(EntityLivingBase p_179878_1_)
             {
-                return !(p_82704_1_ instanceof EntityLivingBase) ? false : (p_i1665_6_ != null && !p_i1665_6_.isEntityApplicable(p_82704_1_) ? false : WYEMEntityAINearestAttackableTarget.this.isSuitableTarget((EntityLivingBase)p_82704_1_, false));
+                if (p_i45880_6_ != null && !p_i45880_6_.apply(p_179878_1_))
+                {
+                    return false;
+                }
+                else
+                {
+                    if (p_179878_1_ instanceof EntityPlayer)
+                    {
+                        double d0 = WYEMEntityAINearestAttackableTarget.this.getTargetDistance();
+
+                        if (p_179878_1_.isSneaking())
+                        {
+                            d0 *= 0.800000011920929D;
+                        }
+
+                        if (p_179878_1_.isInvisible())
+                        {
+                            float f = ((EntityPlayer)p_179878_1_).getArmorVisibility();
+
+                            if (f < 0.1F)
+                            {
+                                f = 0.1F;
+                            }
+
+                            d0 *= (double)(0.7F * f);
+                        }
+
+                        if ((double)p_179878_1_.getDistanceToEntity(WYEMEntityAINearestAttackableTarget.this.taskOwner) > d0)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return WYEMEntityAINearestAttackableTarget.this.isSuitableTarget(p_179878_1_, false);
+                }
+            }
+            public boolean apply(Object p_apply_1_)
+            {
+                return this.func_179878_a((EntityLivingBase)p_apply_1_);
             }
         };
     }
@@ -84,7 +122,8 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
         else
         {
             double d0 = this.getTargetDistance();
-            List list = this.taskOwner.worldObj.selectEntitiesWithinAABB(this.targetClass, this.taskOwner.boundingBox.expand(d0, 4.0D, d0), this.targetEntitySelector);
+            // func_175647_a = selectEntitiesWithinAABB
+            List list = this.taskOwner.worldObj.func_175647_a(this.targetClass, this.taskOwner.getEntityBoundingBox().expand(d0, 4.0D, d0), Predicates.and(this.targetEntitySelector, IEntitySelector.NOT_SPECTATING));
             Collections.sort(list, this.theNearestAttackableTargetSorter);
             if (list.isEmpty())
             {
@@ -158,7 +197,7 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
     private List getCrownsEnemies(List list)
     {
         double dis = this.getTargetDistance();
-    	list = this.taskOwner.worldObj.getEntitiesWithinAABBExcludingEntity(this.taskOwner, this.taskOwner.boundingBox.expand(dis, 4.0D, dis));
+    	list = this.taskOwner.worldObj.getEntitiesWithinAABBExcludingEntity(this.taskOwner, this.taskOwner.getEntityBoundingBox().expand(dis, 4.0D, dis));
     	Iterator itr = list.iterator();
     	while(itr.hasNext())
     	{
