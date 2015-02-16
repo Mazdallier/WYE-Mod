@@ -42,7 +42,7 @@ public class ClientProxy extends CommonProxy
 						}
 						if(isCollided && mc.thePlayer.isSneaking())
 						{
-							mc.thePlayer.motionY = 0.065555559;
+							mc.thePlayer.motionY = 0;
 						}
 					}
 				}

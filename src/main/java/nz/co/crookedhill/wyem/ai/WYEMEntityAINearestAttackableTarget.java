@@ -17,6 +17,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITarget;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -183,6 +184,14 @@ public class WYEMEntityAINearestAttackableTarget extends EntityAITarget
     		}
     		else if(entity.getClass() == this.taskOwner.getClass())
     		{
+    			if(entity instanceof EntitySkeleton)
+    			{
+    				/* if its a different type of skeleton, attack it. otherwise remove it from the list */
+    				if(((EntitySkeleton)entity).getSkeletonType() != ((EntitySkeleton)this.taskOwner).getSkeletonType())
+    				{
+    					continue;
+    				}
+    			}
     			itr.remove();
     		}
     	}
