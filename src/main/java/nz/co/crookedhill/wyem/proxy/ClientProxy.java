@@ -2,7 +2,9 @@ package nz.co.crookedhill.wyem.proxy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import nz.co.crookedhill.wyem.WYEM;
 import nz.co.crookedhill.wyem.item.WYEMItem;
+import nz.co.crookedhill.wyem.network.DamageMessage;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -20,6 +22,11 @@ public class ClientProxy extends CommonProxy
 	@SideOnly(value=Side.CLIENT)
 	public class TickEvents
 	{
+		public boolean isCollided = false;
+		int movedBlocks = 0;
+		int[] shouldDamage = {0,0};
+		public double prevY;
+		public double currY;
 		Minecraft mc;
 		public TickEvents(Minecraft mc)
 		{
@@ -31,19 +38,33 @@ public class ClientProxy extends CommonProxy
 		{
 			if(mc.currentScreen == null)
 			{
-				for(ItemStack item : mc.thePlayer.inventory.armorInventory)
+				ItemStack boots =  mc.thePlayer.inventory.armorInventory[0];
+				if(boots != null && boots.getItem() == WYEMItem.spiderTreads)
 				{
-					if(item != null && item.getItem() == WYEMItem.spiderTreads)
+					isCollided = mc.thePlayer.isCollidedHorizontally;
+					if(isCollided)
 					{
-						boolean isCollided = mc.thePlayer.isCollidedHorizontally;
-						if(isCollided)
-						{
-							mc.thePlayer.motionY = 0.065555559;
-						}
-						if(isCollided && mc.thePlayer.isSneaking())
-						{
-							mc.thePlayer.motionY = 0;
-						}
+						shouldDamage[0] = 1;
+						currY += prevY - currY;
+						mc.thePlayer.motionY = 0.065555559;
+					}
+					else
+					{
+						shouldDamage[1] = 1;
+						movedBlocks = (int)Math.abs(currY - prevY);
+						prevY = mc.thePlayer.posY;
+					}
+					if(!isCollided && movedBlocks > 0 && shouldDamage[0] == 1 & shouldDamage[1] == 1)
+					{
+						shouldDamage[0] = 0; shouldDamage[1] = 0;
+						WYEM.network.sendToServer(new DamageMessage(movedBlocks));
+						//boots.damageItem(movedBlocks, mc.thePlayer);
+						System.out.println(movedBlocks);
+						movedBlocks = 0;
+					}
+					if(isCollided && mc.thePlayer.isSneaking())
+					{
+						mc.thePlayer.motionY = 0;
 					}
 				}
 			}

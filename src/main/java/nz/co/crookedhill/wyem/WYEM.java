@@ -8,6 +8,8 @@ import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
 import nz.co.crookedhill.wyem.item.WYEMItem;
+import nz.co.crookedhill.wyem.network.DamageMessage;
+import nz.co.crookedhill.wyem.network.DamageMessageHandler;
 import nz.co.crookedhill.wyem.proxy.ClientProxy;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -15,6 +17,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -22,13 +25,15 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class WYEM
 {
 	public static final String MODID = "wyem";
-	public static final String VERSION = "0.1.1.2";
+	public static final String VERSION = "0.1.1.3";
 	
 	@SidedProxy(clientSide="nz.co.crookedhill.wyem.proxy.ClientProxy", serverSide="nz.co.crookedhill.wyem.proxy.CommonProxy")
 	public static ClientProxy proxy;
 	
 	@Instance("wyem")
 	public static WYEM instance;
+	
+	public static SimpleNetworkWrapper network;
 
 	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", 15, new int[] {1, 3, 2, 1}, 25);
 	//Use a custom item as an icon (assuming it is instantiated in a class called ModItems)
@@ -43,6 +48,7 @@ public class WYEM
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
+		network.registerMessage(DamageMessageHandler.class, DamageMessage.class, 0, Side.SERVER);
 		WYEMConfigHelper.init(new File(event.getModConfigurationDirectory().getAbsolutePath() + File.separator + WYEM.MODID + File.separator + WYEM.MODID + ".cfg"));
 	}
 
