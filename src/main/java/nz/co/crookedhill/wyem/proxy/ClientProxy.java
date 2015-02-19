@@ -20,6 +20,9 @@ public class ClientProxy extends CommonProxy
 	@SideOnly(value=Side.CLIENT)
 	public class TickEvents
 	{
+		public boolean isCollided = false;
+		public int prevY;
+
 		Minecraft mc;
 		public TickEvents(Minecraft mc)
 		{
@@ -31,21 +34,24 @@ public class ClientProxy extends CommonProxy
 		{
 			if(mc.currentScreen == null)
 			{
-				for(ItemStack item : mc.thePlayer.inventory.armorInventory)
+				ItemStack boots =  mc.thePlayer.inventory.armorInventory[0];
+				if(boots != null && boots.getItem() == WYEMItem.spiderTreads)
 				{
-					if(item != null && item.getItem() == WYEMItem.spiderTreads)
+					isCollided = mc.thePlayer.isCollidedHorizontally;
+					if(isCollided)
 					{
-						boolean isCollided = mc.thePlayer.isCollidedHorizontally;
-						if(isCollided)
-						{
-							mc.thePlayer.motionY = 0.065555559;
-						}
-						if(isCollided && mc.thePlayer.isSneaking())
-						{
-							mc.thePlayer.motionY = 0;
-						}
+						mc.thePlayer.motionY = 0.065555559;
+					}
+					else
+					{
+						
+					}
+					if(isCollided && mc.thePlayer.isSneaking())
+					{
+						mc.thePlayer.motionY = 0;
 					}
 				}
+
 			}
 		}
 	}
