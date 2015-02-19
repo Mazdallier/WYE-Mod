@@ -15,22 +15,28 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import nz.co.crookedhill.wyem.item.WYEMItem;
+import nz.co.crookedhill.wyem.network.DamageMessage;
+import nz.co.crookedhill.wyem.network.DamageMessageHandler;
 import nz.co.crookedhill.wyem.proxy.ClientProxy;
 
 @Mod(modid = WYEM.MODID, version = WYEM.VERSION)
 public class WYEM
 {
 	public static final String MODID = "wyem";
-	public static final String VERSION = "1.0.0.1";
+	public static final String VERSION = "1.0.0.2";
 	
 	@SidedProxy(clientSide="nz.co.crookedhill.wyem.proxy.ClientProxy", serverSide="nz.co.crookedhill.wyem.proxy.CommonProxy")
 	public static ClientProxy proxy;
 	
 	@Instance("wyem")
 	public static WYEM instance;
+	
+	public static SimpleNetworkWrapper network;
 
 	public static ArmorMaterial MATERIAL = EnumHelper.addArmorMaterial("wyeMaterial", WYEM.MODID + "zombieCrown", 15, new int[] {1, 3, 2, 1}, 25);
 	//Use a custom item as an icon (assuming it is instantiated in a class called ModItems)
@@ -45,6 +51,9 @@ public class WYEM
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
+		 network = NetworkRegistry.INSTANCE.newSimpleChannel("wyemnetwork");
+	     network.registerMessage(DamageMessageHandler.class, DamageMessage.class, 0, Side.SERVER);
+	     // network.registerMessage(SecondMessage.Handler.class, SecondMessage.class, 1, Side.CLIENT);
 		WYEMConfigHelper.init(new File(event.getModConfigurationDirectory().getAbsolutePath() + File.separator + WYEM.MODID + File.separator + WYEM.MODID + ".cfg"));
 	}
 

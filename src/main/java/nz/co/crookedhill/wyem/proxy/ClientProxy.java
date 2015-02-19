@@ -7,7 +7,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import nz.co.crookedhill.wyem.WYEM;
 import nz.co.crookedhill.wyem.item.WYEMItem;
+import nz.co.crookedhill.wyem.network.DamageMessage;
 
 public class ClientProxy extends CommonProxy
 {
@@ -21,7 +23,10 @@ public class ClientProxy extends CommonProxy
 	public class TickEvents
 	{
 		public boolean isCollided = false;
-		public int prevY;
+		int movedBlocks = 0;
+		int[] shouldDamage = {0,0};
+		public double prevY;
+		public double currY;
 
 		Minecraft mc;
 		public TickEvents(Minecraft mc)
@@ -40,18 +45,29 @@ public class ClientProxy extends CommonProxy
 					isCollided = mc.thePlayer.isCollidedHorizontally;
 					if(isCollided)
 					{
+						shouldDamage[0] = 1;
+						currY += prevY - currY;
 						mc.thePlayer.motionY = 0.065555559;
 					}
 					else
 					{
-						
+						shouldDamage[1] = 1;
+						movedBlocks = (int)Math.abs(currY - prevY);
+						prevY = mc.thePlayer.posY;
+					}
+					if(!isCollided && movedBlocks > 0 && shouldDamage[0] == 1 & shouldDamage[1] == 1)
+					{
+						shouldDamage[0] = 0; shouldDamage[1] = 0;
+						WYEM.network.sendToServer(new DamageMessage(movedBlocks));
+						//boots.damageItem(movedBlocks, mc.thePlayer);
+						System.out.println(movedBlocks);
+						movedBlocks = 0;
 					}
 					if(isCollided && mc.thePlayer.isSneaking())
 					{
 						mc.thePlayer.motionY = 0;
 					}
 				}
-
 			}
 		}
 	}
